@@ -1,0 +1,22 @@
+{
+  "project": "Unicode CLDR with app-maintained supplemental search labels",
+  "release": "release-48",
+  "commit": "acd6d88ae493633240e19a87a721076a8a75c310",
+  "license": "Unicode-3.0 (CLDR data); MIT (app supplements)",
+  "sources": [
+    "https://raw.githubusercontent.com/unicode-org/cldr/acd6d88ae493633240e19a87a721076a8a75c310/common/supplemental/windowsZones.xml",
+    "https://raw.githubusercontent.com/unicode-org/cldr/acd6d88ae493633240e19a87a721076a8a75c310/common/main/zh.xml",
+    "https://raw.githubusercontent.com/unicode-org/cldr/acd6d88ae493633240e19a87a721076a8a75c310/common/main/en.xml",
+    "https://raw.githubusercontent.com/unicode-org/cldr/acd6d88ae493633240e19a87a721076a8a75c310/common/supplemental/supplementalMetadata.xml",
+    "https://raw.githubusercontent.com/unicode-org/cldr/acd6d88ae493633240e19a87a721076a8a75c310/LICENSE"
+  ],
+  "cldr_windows_zone_entries": 139,
+  "windows_zone_entries": 144,
+  "app_supplements": [
+    "British Columbia Standard Time",
+    "Alberta Standard Time",
+    "Manitoba Standard Time",
+    "Mid-Atlantic Standard Time",
+    "Kamchatka Standard Time"
+  ]
+}

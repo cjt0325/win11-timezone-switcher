@@ -1,41 +1,20 @@
-时区切换 1.0 — Windows 11
-========================
+时区切换 1.1.0 — Windows 11
+==========================
 
-使用
-1. 双击桌面“时区切换”快捷方式，或运行 TimeZoneSwitcher.exe。
-2. 在左侧选中上海、洛杉矶或纽约，点击“切换所选”。程序读回系统时区后才会提示成功。
-3. 右侧可以搜索中文名称、英文 Windows 时区 ID 或 UTC 偏移，再“添加到常用”。
-4. 关闭窗口后程序留在托盘。在任务栏右下角的隐藏图标区域，也可找到蓝色时钟图标。
-5. 左键图标打开管理窗口，右键图标直接切换常用时区，点“退出”完全结束。
-6. 已运行时再打开桌面快捷方式，会显示原有窗口，不会重复常驻。
+1. 运行 TimeZoneSwitcher.exe，可为它创建桌面快捷方式。保留同目录 .exe.config 文件。
+2. 搜索国家、城市、缩写、IANA ID 或 UTC 偏移，例如：日本时间、德国、韩国、美国、JST、Asia/Tokyo、UTC+9、+0530。
+3. 多时区国家会显示多个结果。下方详情展示当地日期时间、本地时差、夏令时和系统标识。
+4. 选中后可“立即切换”或“加入常用”。常用列表支持移除、上移和下移，托盘顺序同步。
+5. 左键托盘蓝色时钟打开窗口，右键快捷切换。关闭或最小化后收起；菜单“退出”完全结束。
+6. “撤销上次切换”可恢复上一次成功操作前的时区；外部更改后会清除过期撤销记录。
+7. Ctrl+F 搜索，F5 刷新，Esc 清空或收起，Ctrl+Q 退出。
 
-权限与系统设置
-普通权限下先尝试切换，失败会显示原因，并出现“管理员重试”按钮。
-管理员重试会使用 Windows 自身的授权提示；取消后不会显示成功。
-如果 Windows 正在自动设置时区，后续可能覆盖你的选择，可通过窗口右下角进入系统设置检查。
-程序遵循 Windows 自带的夏令时规则，因此洛杉矶和纽约的 UTC 偏移会随日期变化。
-切换会改变整个系统的本地时区和时间显示，不修改 UTC 时钟，不涉及网络连接或账号设置。
+切换后读取 Windows 设置确认结果，失败显示原因并提供管理员重试，取消授权正常返回。
+美国等地区遵循 Windows 夏令时规则；UTC 偏移搜索按今天计算。
+自动设置时区可能覆盖手动选择，可通过窗口右下角进入系统设置检查。
+常用列表保存在 %LOCALAPPDATA%\TimeZoneSwitcher\settings.json，升级沿用此配置。
+默认手动启动，不添加开机启动、服务或计划任务。
+程序改变系统时区及本地时间显示，不修改 UTC 时钟，不联网查询地理位置。
 
-文件与数据
-TimeZoneSwitcher.exe.config 用于高清显示配置，请与 exe 放在一起。
-常用列表：%LOCALAPPDATA%\TimeZoneSwitcher\settings.json
-损坏配置会备份为 settings.json.damaged-日期时间，并回到默认列表。
-默认手动启动，不添加开机启动项、计划任务或 Windows 服务。
-移动程序文件夹后，需重新创建指向新位置的桌面快捷方式。
-移除工具：先从托盘退出，再删除程序文件夹和桌面快捷方式。
-
-重新编译
-源码包包含 build.ps1、C# 文件、app.config、app.manifest、图标和 tests。
-在 Windows PowerShell 或 PowerShell 中进入源码目录后运行：
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
-输出位于源码目录 bin，使用系统自带 .NET Framework 编译器，无需 NuGet 或 .NET SDK。
-核心测试：
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -Tests
-核心测试使用模拟命令，不更改真实系统时区。
-测试还包括隐藏窗口逻辑、单实例唤回和 100%/125%/150% 比例的布局检查。
-真实切换验证（会临时更改系统时区，结束时恢复原时区）：
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 -IntegrationTests
-
-技术参考
-https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil
-https://learn.microsoft.com/en-us/dotnet/desktop/winforms/high-dpi-support-in-windows-forms
+源码与文档：https://github.com/cjt0325/win11-timezone-switcher
+代码：MIT（LICENSE）。离线国家/城市数据：Unicode CLDR 48（UNICODE-LICENSE.txt）。

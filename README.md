@@ -1,96 +1,85 @@
 # Windows 11 时区切换
 
-一个轻量的中文 Windows 托盘工具，用来快速切换**整个系统的时区**。默认提供上海、洛杉矶、纽约，支持从 Windows 全部时区中搜索和管理常用项。
+中文、免安装的系统时区工具，支持离线搜索国家和城市、预览当地时间，并从托盘快速切换。使用 C#、WinForms、.NET Framework 4.8 和 Windows 自带的 `tzutil.exe`。
 
-使用 C#、WinForms 和 Windows 自带的 `tzutil.exe`，不需要 Electron、NuGet 或 .NET SDK。程序本体约 40 KB，适用于 Windows 11 x64 和 .NET Framework 4.8 或更高版本。
+## 下载
 
-## 下载与使用
+[下载 v1.1.0 免安装包](https://github.com/cjt0325/win11-timezone-switcher/raw/refs/heads/main/downloads/TimeZoneSwitcher-v1.1.0-win-x64.zip) · [校验值](downloads/SHA256SUMS.txt) · [源码 ZIP](https://github.com/cjt0325/win11-timezone-switcher/archive/refs/heads/main.zip)
 
-直接下载 [v1.0.0 免安装包](https://github.com/cjt0325/win11-timezone-switcher/raw/refs/heads/main/downloads/TimeZoneSwitcher-v1.0.0-win-x64.zip)，解压后运行 `TimeZoneSwitcher.exe`。文件校验值见 [SHA256SUMS.txt](downloads/SHA256SUMS.txt)。
+解压后运行 `TimeZoneSwitcher.exe`，保留同目录的 `.exe.config` 文件。可自行为 exe 创建桌面快捷方式。适用于 Windows 11 x64，不需要安装 .NET SDK、Electron、NuGet 或 Python。
 
-也可以下载 [仓库源码 ZIP](https://github.com/cjt0325/win11-timezone-switcher/archive/refs/heads/main.zip)，或使用 Git 克隆本仓库。
+## 搜索与预览
 
-请将 `TimeZoneSwitcher.exe.config` 与程序放在一起，它用于高清显示配置。需要桌面入口时，可以为 exe 创建桌面快捷方式。
+| 输入示例 | 行为 |
+| --- | --- |
+| `日本`、`日本时间`、`Japan`、`JST` | 查找日本时区，显示“日本 · 东京” |
+| `德国时间`、`韩国`、`印度` | 按国家查找相关 Windows 时区 |
+| `美国`、`加拿大`、`澳大利亚` | 列出该国家的多个时区，供用户选择 |
+| `纽约`、`Berlin`、`美西` | 城市或常见叫法 |
+| `Asia/Tokyo`、`Pacific Standard Time` | IANA 或 Windows 标识 |
+| `UTC+9`、`GMT+05:30`、`+0530` | 按当前 UTC 偏移精确匹配 |
+| `日本 UTC+9` | 组合条件 |
 
-- 左键托盘时钟图标，打开管理窗口。
-- 右键托盘图标，直接切换常用时区；菜单会勾选当前系统时区。
-- 管理窗口支持搜索中文名称、Windows 时区 ID 和 UTC 偏移，并添加或移除常用项。
-- 关闭窗口后继续在托盘运行；从托盘菜单选择“退出”结束程序。
-- 再次启动会唤回已有窗口，不会重复常驻。
+显示匹配数量、无结果提示，支持一键清空。选中结果可查看当地日期时间、相对本地的时差、夏令时状态、相关地区、Windows 和 IANA 标识，并复制信息。
+
+偏移按今天计算；城市搜索使用 CLDR 代表城市和常见别名。时区列表及切换规则来自本机 Windows，因此会随系统更新而变化。
+
+## 日常使用
+
+- 搜索结果可“立即切换”，也可以先“加入常用”。
+- 常用时区默认包含中国、洛杉矶、纽约，支持删除和上下排序；托盘菜单同步保存的顺序。
+- 左键托盘时钟图标打开窗口，右键直接切换常用时区。
+- 关闭或最小化窗口后收起到托盘，菜单“退出”结束程序；重复启动会唤回已有窗口。
+- 撤销按钮可恢复上一次成功切换前的时区。外部程序改变时区后，过期撤销记录自动清除。
+- `Ctrl+F` 聚焦搜索，`F5` 刷新，`Esc` 清空搜索或收起窗口，`Ctrl+Q` 退出。
 
 默认手动启动，不注册开机启动项、服务或计划任务。
 
-## 切换与权限
+## 切换确认与配置
 
-切换在后台执行，程序读取系统设置确认生效后才显示成功。普通权限失败时，会显示错误原因并提供“管理员重试”；取消授权后不会显示成功。
+时区命令在后台执行。程序检查退出结果并重新读取系统设置，确认生效后才显示成功。普通权限失败时提供“管理员重试”；取消授权后正常返回。
 
-美国时区使用 Windows 的夏令时规则。如果 Windows 开启了自动设置时区，之后可能覆盖手动选择，可通过窗口中的“系统日期和时间”入口检查。
+如果 Windows 开启自动设置时区，后续可能覆盖手动选择，可通过窗口的“系统日期和时间”入口检查。此工具更改系统时区与本地时间显示，不修改 UTC 时钟，不查询公网 IP。
 
-此工具更改系统时区和本地时间显示，不修改 UTC 时钟，不执行网络查询。
+常用列表保存在 `%LOCALAPPDATA%\TimeZoneSwitcher\settings.json`，升级可沿用已有配置。写入采用临时文件替换；损坏配置可备份并恢复默认列表。
 
-## 本地配置
-
-常用时区保存在：
-
-```text
-%LOCALAPPDATA%\TimeZoneSwitcher\settings.json
-```
-
-配置写入采用临时文件替换。无法读取时会恢复默认列表并提示；可备份的损坏文件会保留为 `settings.json.damaged-日期时间`。
-
-## 从源码编译
-
-在 Windows PowerShell 中进入仓库目录，运行：
+## 从源码编译和测试
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
 ```
 
-程序输出到 `bin`。构建脚本使用 Windows 自带的 .NET Framework C# 编译器；图标已包含在源码中。
-
-也可以指定输出目录：
+输出到 `bin`，使用 Windows 自带 .NET Framework 编译器。索引与图标均已包含，普通构建无需联网。
 
 ```powershell
-.\build.ps1 -OutputDirectory .\dist
-```
-
-## 验证
-
-核心与界面逻辑测试使用模拟切换，不更改真实系统时区：
-
-```powershell
+# 模拟命令与隐藏窗口测试，不改变真实时区
 .\build.ps1 -Tests
-```
 
-首版通过 19 项核心检查和 47 项界面/布局断言，包含参数校验、配置恢复、权限失败、取消授权、夏令时、托盘菜单逻辑、单实例唤回和关闭/退出行为。100%/125%/150% 的布局通过离屏缩放渲染检查；这不等同于所有真实显示器组合的测试。
-
-下面的集成测试会实际切换到洛杉矶、纽约和上海，并在 `finally` 中恢复原时区和夏令时禁用标志：
-
-```powershell
+# 实际验证洛杉矶、纽约、中国、日本、印度、英国；finally 恢复原时区与夏令时标志
 .\build.ps1 -IntegrationTests
 ```
 
-真实切换已在 Windows 11 x64 上验证。管理员授权取消路径采用模拟测试。
+测试覆盖安装的 Windows 时区、国家和城市搜索、偏移精确匹配、配置恢复、排序、直接切换、撤销与外部变更、权限失败和取消授权。显示缩放采用 100%/125%/150% 离屏渲染与尺寸断言检查。测试计数随系统时区数量变化。
+
+界面测试期间若已有用户实例运行，会跳过单实例唤回探针；其他检查继续。管理员授权取消使用模拟结果测试。
+
+## 数据与许可证
+
+代码使用 [MIT](LICENSE)。离线搜索索引由 Unicode CLDR 48 生成，另含项目维护的 Windows 新时区和旧版兼容标签；实际偏移和夏令时始终读取 Windows。
+
+完整来源、固定提交与许可证见 [第三方数据说明](THIRD_PARTY_NOTICES.md)。刷新索引可运行 `python tools/generate_search_data.py`，仅此步骤需要 Python 和网络。
 
 ## 项目结构
 
 | 文件 | 职责 |
 | --- | --- |
-| `Core.cs` | 时区目录、配置存储、系统命令执行与结果确认 |
-| `MainForm.cs` | 管理窗口、托盘菜单、单实例唤回窗口 |
-| `Program.cs` | 程序入口与单实例控制 |
-| `build.ps1` | 编译、图标生成和测试入口 |
-| `tests/` | 核心、界面逻辑和真实切换测试 |
+| `Core.cs` / `Search.cs` | 系统目录、搜索、配置及切换确认 |
+| `MainForm.cs` / `Program.cs` | 管理窗口、托盘、快捷键与单实例 |
+| `data/` / `licenses/` | 离线索引、来源记录与第三方许可证 |
+| `build.ps1` / `tests/` | 构建与验证 |
 
-## 许可证
-
-[MIT License](LICENSE)，允许使用、修改和分发，请保留许可证和版权声明。
-
-## 系统接口参考
-
-- [Windows tzutil](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil)
-- [.NET Framework WinForms 高清显示支持](https://learn.microsoft.com/en-us/dotnet/desktop/winforms/high-dpi-support-in-windows-forms)
+接口参考：[Windows tzutil](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil)、[WinForms 高清显示](https://learn.microsoft.com/en-us/dotnet/desktop/winforms/high-dpi-support-in-windows-forms)。
 
 ---
 
-Lightweight Windows 11 system time zone switcher with a Chinese UI, tray shortcuts, favorites and verified system changes. Built with C# and WinForms. MIT licensed.
+Offline Windows 11 system time zone switcher with Chinese UI, country/city/IANA search, previews, favorites, tray shortcuts, undo and verified system changes. MIT licensed; bundled CLDR data uses Unicode License V3.

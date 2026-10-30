@@ -12,7 +12,7 @@ internal static class IntegrationTests
         Console.WriteLine("ORIGINAL: " + original);
         try
         {
-            foreach (string id in new[] { "Pacific Standard Time", "Eastern Standard Time", "China Standard Time" })
+            foreach (string id in new[] { "Pacific Standard Time", "Eastern Standard Time", "China Standard Time", "Tokyo Standard Time", "India Standard Time", "GMT Standard Time" })
             {
                 var result = service.Switch(id, false);
                 Console.WriteLine(id + ": " + (result.Success ? "PASS" : "FAIL") + "; actual=" + result.ActualId + "; " + result.Message);

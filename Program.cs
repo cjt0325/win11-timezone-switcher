@@ -7,8 +7,8 @@ using System.Windows.Forms;
 
 [assembly: System.Reflection.AssemblyTitle("时区切换")]
 [assembly: System.Reflection.AssemblyDescription("Windows 11 本地时区切换工具")]
-[assembly: System.Reflection.AssemblyVersion("1.0.0.0")]
-[assembly: System.Reflection.AssemblyFileVersion("1.0.0.0")]
+[assembly: System.Reflection.AssemblyVersion("1.1.0.0")]
+[assembly: System.Reflection.AssemblyFileVersion("1.1.0.0")]
 [assembly: TargetFramework(".NETFramework,Version=v4.8", FrameworkDisplayName = ".NET Framework 4.8")]
 
 namespace TimeZoneSwitcher
@@ -27,7 +27,7 @@ namespace TimeZoneSwitcher
             {
                 if (!created)
                 {
-                    // A message-only rendezvous window survives hiding the main window to the tray.
+                    // The hidden rendezvous window remains discoverable while the main window is in the tray.
                     for (int attempt = 0; attempt < 30; attempt++)
                     {
                         IntPtr window = Native.FindWindow(null, "TimeZoneSwitcher.Rendezvous." + userId);

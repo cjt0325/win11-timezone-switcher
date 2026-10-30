@@ -17,31 +17,37 @@ namespace TimeZoneSwitcher
         public TimeZoneInfo Zone { get; private set; }
         public string Id { get { return Zone.Id; } }
         public string Name { get; private set; }
+        public ZoneSearchInfo SearchInfo { get; private set; }
+        internal string[] SearchTerms { get; private set; }
         public ZoneEntry(TimeZoneInfo zone)
         {
             Zone = zone;
+            SearchInfo = SearchIndex.Find(zone.Id);
             switch (zone.Id)
             {
-                case "China Standard Time": Name = "上海 · 北京时间"; break;
-                case "Pacific Standard Time": Name = "洛杉矶 · 太平洋时间"; break;
-                case "Eastern Standard Time": Name = "纽约 · 美国东部时间"; break;
-                case "GMT Standard Time": Name = "伦敦"; break;
-                case "Tokyo Standard Time": Name = "东京"; break;
+                case "China Standard Time": Name = "中国 · 北京 / 上海"; break;
+                case "Pacific Standard Time": Name = "美国 · 洛杉矶"; break;
+                case "Eastern Standard Time": Name = "美国 · 纽约"; break;
+                case "GMT Standard Time": Name = "英国 · 伦敦"; break;
+                case "Tokyo Standard Time":
+                    Name = "日本 · 东京";
+                    break;
                 case "Singapore Standard Time": Name = "新加坡"; break;
-                default: Name = zone.StandardName; break;
+                default: Name = String.IsNullOrEmpty(SearchInfo.Display) ? zone.StandardName : SearchInfo.Display; break;
             }
+            SearchTerms = ZoneSearch.BuildTerms(this);
         }
         public string OffsetText
         {
             get { return FormatOffset(Zone.GetUtcOffset(DateTimeOffset.UtcNow)); }
         }
         public static string FormatOffset(TimeSpan offset)
-        { return "UTC" + (offset < TimeSpan.Zero ? "−" : "+") + offset.Duration().ToString(@"hh\:mm"); }
+        { return "UTC" + (offset < TimeSpan.Zero ? "−" : "+") + FormatHours(offset); }
+        public static string FormatHours(TimeSpan value)
+        { TimeSpan absolute = value.Duration(); return ((int)absolute.TotalHours).ToString("00", CultureInfo.InvariantCulture) + ":" + absolute.Minutes.ToString("00", CultureInfo.InvariantCulture); }
         public bool Matches(string query)
         {
-            string haystack = (Name + " " + Id + " " + Zone.DisplayName + " " + OffsetText).Replace('−', '-');
-            return (query ?? "").Replace('−', '-').Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-                .All(token => haystack.IndexOf(token, StringComparison.CurrentCultureIgnoreCase) >= 0);
+            return ZoneSearch.Score(this, query) >= 0;
         }
         public override string ToString() { return Name + "  ·  " + OffsetText; }
     }
@@ -59,6 +65,13 @@ namespace TimeZoneSwitcher
         {
             ZoneEntry entry;
             return id != null && byId.TryGetValue(id, out entry) ? entry : null;
+        }
+        public List<ZoneEntry> Search(string query)
+        {
+            return All.Select(zone => new { Zone = zone, Score = ZoneSearch.Score(zone, query) })
+                .Where(item => item.Score >= 0).OrderBy(item => item.Score)
+                .ThenBy(item => item.Zone.Zone.GetUtcOffset(DateTimeOffset.UtcNow))
+                .ThenBy(item => item.Zone.Name, StringComparer.CurrentCulture).Select(item => item.Zone).ToList();
         }
         public List<string> Defaults()
         {
@@ -87,6 +100,7 @@ namespace TimeZoneSwitcher
         public SettingsStore(string path, ZoneCatalog catalog) { this.path = path; this.catalog = catalog; }
         public Settings Load()
         {
+            Warning = null;
             if (!File.Exists(path)) return new Settings { FavoriteIds = catalog.Defaults() };
             try
             {

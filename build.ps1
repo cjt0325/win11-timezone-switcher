@@ -43,8 +43,12 @@ if (-not (Test-Path -LiteralPath $iconPath)) {
     } finally { $writer.Dispose(); $iconStream.Dispose() }
 }
 $common = @('/nologo', '/codepage:65001', '/optimize+', '/platform:x64', '/r:System.dll', '/r:System.Core.dll', '/r:System.Windows.Forms.dll', '/r:System.Drawing.dll', '/r:System.Runtime.Serialization.dll')
+$indexPath = Join-Path $PSScriptRoot 'data\timezones.json'
+if (-not (Test-Path -LiteralPath $indexPath)) { throw 'Bundled search index is missing.' }
+$common += "/resource:$indexPath,TimeZoneSwitcher.TimeZones.json"
 $exe = Join-Path $OutputDirectory 'TimeZoneSwitcher.exe'
-$sources = @('Core.cs', 'Program.cs', 'MainForm.cs') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+$coreSources = @('Core.cs', 'Search.cs') | ForEach-Object { Join-Path $PSScriptRoot $_ }
+$sources = $coreSources + (@('Program.cs', 'MainForm.cs') | ForEach-Object { Join-Path $PSScriptRoot $_ })
 & $compiler @common '/target:winexe' "/win32manifest:$(Join-Path $PSScriptRoot 'app.manifest')" "/win32icon:$iconPath" "/out:$exe" @sources
 if ($LASTEXITCODE -ne 0) { throw 'Application build failed.' }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'app.config') -Destination "$exe.config" -Force
@@ -52,10 +56,11 @@ Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'README.txt') -Destination (Join
 if (Test-Path -LiteralPath (Join-Path $PSScriptRoot 'LICENSE')) {
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'LICENSE') -Destination (Join-Path $OutputDirectory 'LICENSE') -Force
 }
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'licenses\UNICODE-LICENSE.txt') -Destination (Join-Path $OutputDirectory 'UNICODE-LICENSE.txt') -Force
 Write-Output "Built: $exe"
 if ($Tests) {
     $testExe = Join-Path $OutputDirectory 'TimeZoneSwitcher.Tests.exe'
-    & $compiler @common '/target:exe' "/out:$testExe" (Join-Path $PSScriptRoot 'Core.cs') (Join-Path $PSScriptRoot 'tests\CoreTests.cs')
+    & $compiler @common '/target:exe' "/out:$testExe" @coreSources (Join-Path $PSScriptRoot 'tests\CoreTests.cs')
     if ($LASTEXITCODE -ne 0) { throw 'Test build failed.' }
     & $testExe
     if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
@@ -68,7 +73,7 @@ if ($Tests) {
 }
 if ($IntegrationTests) {
     $integrationExe = Join-Path $OutputDirectory 'TimeZoneSwitcher.IntegrationTests.exe'
-    & $compiler @common '/target:exe' "/out:$integrationExe" (Join-Path $PSScriptRoot 'Core.cs') (Join-Path $PSScriptRoot 'tests\IntegrationTests.cs')
+    & $compiler @common '/target:exe' "/out:$integrationExe" @coreSources (Join-Path $PSScriptRoot 'tests\IntegrationTests.cs')
     if ($LASTEXITCODE -ne 0) { throw 'Integration test build failed.' }
     & $integrationExe
     if ($LASTEXITCODE -ne 0) { throw 'Integration tests failed; check restoration output.' }
