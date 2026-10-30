@@ -6,7 +6,9 @@
 
 ## 下载与使用
 
-从 [Releases](https://github.com/cjt0325/win11-timezone-switcher/releases/latest) 下载 `TimeZoneSwitcher-v1.0.0-win-x64.zip`，解压后运行 `TimeZoneSwitcher.exe`。
+直接下载 [v1.0.0 免安装包](https://github.com/cjt0325/win11-timezone-switcher/raw/refs/heads/main/downloads/TimeZoneSwitcher-v1.0.0-win-x64.zip)，解压后运行 `TimeZoneSwitcher.exe`。文件校验值见 [SHA256SUMS.txt](downloads/SHA256SUMS.txt)。
+
+也可以下载 [仓库源码 ZIP](https://github.com/cjt0325/win11-timezone-switcher/archive/refs/heads/main.zip)，或使用 Git 克隆本仓库。
 
 请将 `TimeZoneSwitcher.exe.config` 与程序放在一起，它用于高清显示配置。需要桌面入口时，可以为 exe 创建桌面快捷方式。
 

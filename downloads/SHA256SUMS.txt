@@ -1,0 +1,1 @@
+51cc67a25c1632f8b90b7eb9d56fceff7c23ecaaaaf8daa797d5b3a1150bf02f  TimeZoneSwitcher-v1.0.0-win-x64.zip
